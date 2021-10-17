@@ -26,17 +26,22 @@ competition Competition;
 color teamColor=blue;
 bool pickedColor=false;
 
+// Don't know how to remove the callback for a keypress.  Don't want
+// the buttons to do anything anymore, so create a callback method that
+// doesn't do anything and point the callback to it.
 void doNothing()
 {
-
 }
 
+// If the up button is pressed, toggle the team color between red and blue
 void mySetColorUp()
 {
   if (teamColor == red) teamColor=blue;
   else teamColor=red;
 }
 
+// If the A button is pressed, set the variable that indicates that the team
+// color has been chosen.
 void myPickColor()
 { 
   pickedColor=true;
@@ -58,16 +63,22 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
+  // Clear the screen and tell the user to pick a team color using the 
+  // UP button, and then A when done.
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1,1);
   Brain.Screen.print("Choose Color (up) - A when done");
   teamColor=red;
 
+  // Setup the callback methods that get called when these buttons are pressed
+  Controller1.ButtonUp.pressed(mySetColorUp);
+  Controller1.ButtonA.pressed(myPickColor);
+
+  // Keep going until the user presses A to settle on a color
   while (!pickedColor)
   {
-    Controller1.ButtonUp.pressed(mySetColorUp);
-    Controller1.ButtonA.pressed(myPickColor);
 
+    // Draw the face in the current color
     Brain.Screen.setPenColor(teamColor);
     Brain.Screen.drawCircle(240,125,110);
     Brain.Screen.drawCircle(180,100, 25);
@@ -79,6 +90,8 @@ void pre_auton(void) {
   Brain.Screen.setCursor(1,1);
   Brain.Screen.print("Done                  ");
   
+  // Reset the callbacks on the button pressed to do nothing when the buttons
+  // are pressed
   Controller1.ButtonUp.pressed( doNothing);
   Controller1.ButtonA.pressed( doNothing);
   
@@ -101,6 +114,9 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   int i;
+
+  // Set one motor to run at 20, and the other to go at 10 depending on the
+  // team color that was selected.
   int leftVel=10, rightVel=10;
   Brain.Screen.clearScreen();
 
@@ -109,6 +125,7 @@ void autonomous(void) {
   else
     rightVel = 20;
 
+  // Alternate between motors on, and motors off
   for (i=0; i<10; i++)
   {
     LeftMotor.setVelocity(leftVel, percent);
@@ -120,6 +137,9 @@ void autonomous(void) {
     RightMotor.stop();
     wait(1, seconds);
   }
+
+  // Note that the 15 second timer will eventually shut down the autonomous
+  // portion of the program
 }
 
 /*---------------------------------------------------------------------------*/
